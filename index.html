@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>50:50 振り返りチェック</title>
+  <style>
+    :root{
+      --navy:#2f4968;
+      --navy2:#243a55;
+      --lav:#efeaf8;
+      --pink:#f7e8ee;
+      --milk:#fffdfb;
+      --sky:#eaf6fb;
+      --ink:#263241;
+      --muted:#728093;
+      --line:#e6dce8;
+      --rose:#b9788d;
+      --blue:#6b8fb6;
+      --green:#789b8a;
+      --shadow:0 14px 34px rgba(59,73,96,.14);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;color:var(--ink);}
+    body{
+      background:
+        radial-gradient(circle at 15% 0%, rgba(233,214,238,.9), transparent 34%),
+        radial-gradient(circle at 95% 8%, rgba(209,232,244,.95), transparent 34%),
+        linear-gradient(180deg,#fffafa 0%, #f3f7fb 55%, #f7eef4 100%);
+      line-height:1.72;
+    }
+    .app{max-width:520px;margin:0 auto;min-height:100vh;padding:18px 14px 28px;}
+    .card{
+      background:rgba(255,253,251,.92);
+      border:1px solid rgba(230,220,232,.9);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      padding:22px 18px;
+      backdrop-filter:blur(8px);
+    }
+    .hero{
+      min-height:calc(100vh - 36px);
+      display:flex;flex-direction:column;justify-content:center;gap:16px;
+    }
+    .title{
+      text-align:center;
+      padding:28px 18px;
+      background:linear-gradient(160deg,rgba(255,255,255,.92),rgba(234,246,251,.92));
+      border:1px solid rgba(225,236,246,.95);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .title:before{
+      content:"50:50";
+      position:absolute;
+      right:-10px;
+      bottom:-28px;
+      font-size:76px;
+      font-weight:900;
+      color:rgba(47,73,104,.08);
+      letter-spacing:-3px;
+    }
+    h1{margin:0 0 8px;font-size:30px;line-height:1.18;color:var(--navy2);letter-spacing:.04em;}
+    .sub{margin:0;color:#607083;font-weight:700;font-size:15px;}
+    .rabbit{
+      width:82px;height:82px;object-fit:contain;display:block;margin:0 auto 12px;
+      filter:drop-shadow(0 8px 12px rgba(55,75,105,.16));
+    }
+    .rabbit.small{width:58px;height:58px;margin:0 0 0 auto;}
+    label.inputLabel{display:block;font-weight:900;margin:12px 0 6px;color:var(--navy2);}
+    input[type="text"], input[type="number"]{
+      width:100%;font-size:20px;padding:14px 14px;border-radius:16px;border:2px solid #e3d8e6;background:#fff;color:var(--ink);outline:none;
+    }
+    input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(107,143,182,.15);}
+    .btn{
+      appearance:none;border:0;border-radius:18px;padding:15px 18px;
+      width:100%;font-size:18px;font-weight:900;letter-spacing:.03em;
+      background:linear-gradient(135deg,var(--navy),#6f8fb2);
+      color:white;box-shadow:0 12px 22px rgba(47,73,104,.22);
+      cursor:pointer;
+    }
+    .btn.secondary{background:#eef2f7;color:var(--navy2);box-shadow:none;border:1px solid #dce5ef;}
+    .btn.rose{background:linear-gradient(135deg,#a96f86,#d29aae);}
+    .mini{font-size:13px;color:var(--muted);margin:10px 0 0;}
+    .screen{display:none;}
+    .screen.active{display:block;}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(249,248,251,.84);backdrop-filter:blur(10px);padding:8px 0 12px;margin:-18px 0 12px;}
+    .progressText{display:flex;justify-content:space-between;align-items:center;font-weight:900;color:var(--navy2);font-size:14px;margin-bottom:8px;}
+    .barWrap{height:10px;border-radius:999px;background:#e7edf4;overflow:hidden;border:1px solid rgba(255,255,255,.8);}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,#b9788d,#6b8fb6);border-radius:999px;transition:.25s;}
+    .questionCard{min-height:calc(100vh - 135px);display:flex;flex-direction:column;gap:14px;}
+    .qnum{font-weight:900;color:var(--rose);letter-spacing:.05em;}
+    .qbox{
+      background:linear-gradient(160deg,#fff,#f5f8fc);
+      border:1px solid #e5edf5;
+      border-radius:24px;
+      padding:20px 18px;
+      min-height:178px;
+      display:flex;align-items:center;
+    }
+    .qtext{font-size:23px;font-weight:900;line-height:1.55;color:#263241;letter-spacing:.02em;}
+    .scaleHint{
+      text-align:center;font-size:13px;font-weight:900;color:#6f5f70;background:var(--pink);
+      padding:9px 10px;border-radius:999px;border:1px solid #ead4df;
+    }
+    .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .choice{
+      border:2px solid #e5dbe6;background:#fff;border-radius:18px;min-height:62px;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      font-weight:900;font-size:24px;color:#536174;cursor:pointer;box-shadow:0 6px 14px rgba(60,70,90,.07);
+    }
+    .choice span{font-size:11px;color:#7c8796;margin-top:-3px;}
+    .choice.selected{background:linear-gradient(160deg,#2f4968,#6b8fb6);color:#fff;border-color:#6b8fb6;}
+    .choice.selected span{color:#eef6ff;}
+    .navs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto;}
+    .rxBox{
+      background:rgba(255,255,255,.86);
+      border:1px solid #e6dce8;border-radius:20px;padding:12px 13px;
+      box-shadow:0 10px 22px rgba(70,80,100,.08);
+    }
+    .rxTitle{font-weight:900;color:var(--navy2);margin-bottom:4px;}
+    .rxText{font-size:13px;color:#5e6b78;margin:0;}
+    .pill{display:inline-block;background:#eef4fa;color:#43617f;border-radius:999px;padding:4px 8px;margin:3px 3px 0 0;font-size:12px;font-weight:900;}
+    .idLine{
+      display:flex;justify-content:space-between;gap:8px;
+      background:#f4f7fb;border:1px solid #e4ebf2;border-radius:16px;
+      padding:10px 12px;margin-bottom:12px;font-weight:900;color:var(--navy2);
+    }
+    .answerList{display:grid;gap:8px;}
+    .ansItem{
+      display:grid;grid-template-columns:42px 1fr 44px;gap:8px;align-items:center;
+      background:#fff;border:1px solid #e8e0e8;border-radius:14px;padding:8px;
+    }
+    .ansNo{font-weight:900;color:var(--rose);text-align:center;}
+    .ansQ{font-size:12px;line-height:1.35;color:#374151;font-weight:700;}
+    .ansVal{font-size:20px;font-weight:900;color:#fff;background:var(--navy);border-radius:12px;text-align:center;padding:5px 0;}
+    .resultHero{text-align:center;padding:14px 0 18px;}
+    .score{
+      width:150px;height:150px;border-radius:999px;margin:8px auto 12px;
+      background:conic-gradient(#b9788d 0deg, #6b8fb6 var(--deg), #e8edf4 var(--deg), #e8edf4 360deg);
+      display:grid;place-items:center;position:relative;
+    }
+    .score:before{content:"";position:absolute;inset:13px;border-radius:999px;background:#fff;}
+    .scoreInner{position:relative;font-weight:900;color:var(--navy2);}
+    .scoreInner strong{font-size:34px;}
+    .resultTitle{font-size:23px;font-weight:900;line-height:1.35;color:var(--navy2);margin:8px 0;}
+    .message{
+      background:#fff;border:1px solid #e9e0e9;border-radius:20px;padding:16px;margin:12px 0;text-align:left;font-weight:700;
+    }
+    .advice{background:#f7fbff;border:1px solid #dceaf6;border-radius:20px;padding:16px;margin:12px 0;text-align:left;}
+    .advice h3{margin:0 0 8px;color:var(--navy2);font-size:17px;}
+    .advice ul{margin:8px 0 0;padding-left:1.25em;}
+    .advice li{margin:6px 0;font-weight:700;}
+    .finalWords{
+      background:linear-gradient(160deg,#fff7fb,#eef7fb);
+      border:1px solid #eadde8;border-radius:22px;padding:18px;font-weight:900;text-align:left;color:#354154;
+    }
+    .shotMark{
+      text-align:center;background:#fff7ed;color:#8a4b16;border:1px solid #fed7aa;
+      border-radius:999px;padding:8px 10px;font-weight:900;font-size:13px;margin:10px 0 14px;
+    }
+    .hidden{display:none!important}
+    @media (max-width:380px){
+      .qtext{font-size:20px}
+      .choice{min-height:56px}
+      h1{font-size:27px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="startScreen" class="screen active hero">
+      <div class="title">
+        <img class="rabbit" id="startRabbit" alt="うさぎ" src="https://sumida-passion.github.io/usagivoca1-70/images/rabbit01.png" onerror="this.style.display='none'">
+        <h1>50：50<br>振り返りチェック</h1>
+        <p class="sub">これは「誰かのこと」ではなく、<br>「自分のこと」として向き合う時間です。</p>
+      </div>
+      <div class="card">
+        <label class="inputLabel" for="className">クラス</label>
+        <input id="className" type="text" placeholder="例：1A">
+        <label class="inputLabel" for="studentNo">番号</label>
+        <input id="studentNo" type="number" inputmode="numeric" placeholder="例：12">
+        <p class="mini">名前は入力しません。最後に「回答一覧」と「診断結果」をスクショ提出できます。</p>
+        <button class="btn" style="margin-top:16px" onclick="startCheck()">START</button>
+      </div>
+    </section>
+
+    <section id="questionScreen" class="screen">
+      <div class="topbar">
+        <div class="progressText">
+          <span id="progressLabel">Q1 / 29</span>
+          <span id="smallId"></span>
+        </div>
+        <div class="barWrap"><div class="bar" id="progressBar"></div></div>
+      </div>
+
+      <div class="questionCard">
+        <div class="card">
+          <div style="display:flex;align-items:start;gap:10px;">
+            <div style="flex:1;">
+              <div class="qnum" id="qnum">Q1</div>
+              <div class="qbox"><div class="qtext" id="qtext"></div></div>
+            </div>
+            <img class="rabbit small" id="qRabbit" alt="うさぎ" src="" onerror="this.style.display='none'">
+          </div>
+          <div class="scaleHint">0＝全然できない　／　5＝かなりできる</div>
+          <div class="choices" id="choices"></div>
+        </div>
+
+        <div class="rxBox">
+          <div class="rxTitle">🌿 崩れた時の処方箋</div>
+          <p class="rxText">感情を消すのではなく、感情に全部持っていかれないために。</p>
+          <span class="pill">6秒待つ</span>
+          <span class="pill">深呼吸</span>
+          <span class="pill">一回離れる</span>
+          <span class="pill">すぐLINEしない</span>
+        </div>
+
+        <div class="navs">
+          <button class="btn secondary" onclick="prevQuestion()">戻る</button>
+          <button class="btn" onclick="nextQuestion()" id="nextBtn">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="summaryScreen" class="screen">
+      <div class="card">
+        <div class="idLine"><span id="summaryId"></span><span id="summaryTotal"></span></div>
+        <h1 style="font-size:25px;margin-bottom:4px;">回答一覧</h1>
+        <div class="shotMark">提出用スクショ①：この一覧を撮影</div>
+        <div class="answerList" id="answerList"></div>
+        <button class="btn rose" style="margin-top:16px" onclick="showResult()">診断結果へ</button>
+        <button class="btn secondary" style="margin-top:10px" onclick="goQuestion(0)">回答を見直す</button>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="card">
+        <div class="idLine"><span id="resultId"></span><span id="resultTotal"></span></div>
+        <div class="shotMark">提出用スクショ②：診断結果とアドバイスを撮影</div>
+        <div class="resultHero">
+          <img class="rabbit" id="resultRabbit" alt="うさぎ" src="https://sumida-passion.github.io/usagivoca1-70/images/rabbit03.png" onerror="this.style.display='none'">
+          <div class="score" id="scoreCircle" style="--deg:0deg"><div class="scoreInner"><strong id="scoreNum">0</strong><br><span id="scoreMax">/145</span></div></div>
+          <div class="resultTitle" id="resultTitle"></div>
+        </div>
+        <div class="message" id="resultMessage"></div>
+        <div id="adviceArea"></div>
+        <div class="finalWords">
+          みんなまだ途中です。<br>
+          感情で崩れる日もあります。<br><br>
+          大切なのは、崩れないことではなく、戻ろうとできること。<br>
+          そして、戻ってきた人を「未来への攻撃材料」で縛り続けないこと。<br><br>
+          みんなで、少しずつ練習していけたらと思います。
+        </div>
+        <button class="btn secondary" style="margin-top:14px" onclick="showSummary()">回答一覧へ戻る</button>
+        <button class="btn" style="margin-top:10px" onclick="restart()">最初からやり直す</button>
+      </div>
+    </section>
+  </div>
+
+<script>
+const questions = [
+  {t:"イライラした時、一回止まれる", c:["emotion"]},
+  {t:"相手にも理由があるかもと思える", c:["relation"]},
+  {t:"「自分の機嫌」でその場の空気を変えない", c:["emotion","control"]},
+  {t:"挨拶はどんな時でも自分からできる", c:["communication"]},
+  {t:"自分と違う考えも受け入れようとすることができる", c:["relation"]},
+  {t:"お気に入りの人が自分以外の人と楽しそうにしていても、不機嫌にはならない", c:["security","control"]},
+  {t:"グループLINEで自分にだけ反応がない時、「嫌われた」と決めつけない", c:["security"]},
+  {t:"相手を困らせるために「もういい」「別に」を使いすぎない", c:["communication","control"]},
+  {t:"「うざい」「キモい」は学校では一切使わないで過ごすことができる", c:["respect"]},
+  {t:"相手の「好きなもの」を冗談でも否定したりしない", c:["respect"]},
+  {t:"相手の予定や気持ちを自分の思い通りにしようとしすぎない", c:["control"]},
+  {t:"人の話をさえぎらないで、落ち着いて聞くことができる", c:["communication"]},
+  {t:"「誰かを仲間はずれにしてやろう」そんな気持ちは持たないようにしてる", c:["respect","control"]},
+  {t:"相手の失敗や粗探しをネタにして喜ぶことはしない", c:["respect","repair"]},
+  {t:"ちょっと強めの言葉を使って相手からマウントをとるなんてことはしない", c:["respect","control"]},
+  {t:"クラスの中で、誰かをバカにするような目配せや、ふくみ笑いはしない", c:["respect"]},
+  {t:"自分たちの集団だけで大声で笑って、周囲を怖がらせることはしていない", c:["respect"]},
+  {t:"学校のルールを破ると、守っている人へ申し訳ないと思える", c:["responsibility"]},
+  {t:"人の過去をネタに、勝手にいじったりなんてことはしない", c:["repair","respect"]},
+  {t:"「自分は1人じゃないからと安心して」孤独な子に強く当たる・なんてことはしない", c:["respect","control"]},
+  {t:"友達とのトラブルを友達に広めて仲間を集めようとする・そんなことはしない", c:["control","repair"]},
+  {t:"なんとなく弱ってるなと思う人に、声をかけてあげることができる", c:["relation","communication"]},
+  {t:"言葉にしにくい性格の子が話す時、待ってあげることができる", c:["communication","relation"]},
+  {t:"掃除を適当にしていたら、逆に誰かに仕事をさせてしまっているのかな・と思える", c:["responsibility"]},
+  {t:"人に「ありがとう」を、落ち着いて、きちんと言える", c:["communication"]},
+  {t:"人に「ごめん」を、素直に、きちんと言える", c:["repair","communication"]},
+  {t:"人の過ちを許すことができる", c:["repair"]},
+  {t:"「自分もまだまだだから」と思うことができる", c:["relation","repair"]},
+  {t:"みんなも一緒に成長していけたらいいなと思える", c:["relation","repair"]}
+];
+
+const rabbitImages = [
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit01.png",
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit02.png",
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit03.png",
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit04.png",
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit05.png",
+  "https://sumida-passion.github.io/usagivoca1-70/images/rabbit06.png"
+];
+
+const categoryNames = {
+  emotion:"感情が強くなった時の一時停止",
+  security:"不安や思い込みとの距離",
+  communication:"言葉にする・聞く・待つ力",
+  respect:"相手の尊厳を守る力",
+  control:"相手を動かそうとしすぎない力",
+  responsibility:"周りへの影響に気づく力",
+  repair:"謝る・許す・戻る力",
+  relation:"みんな途中だと思える力"
+};
+
+const adviceTexts = {
+  emotion:["6秒待つ、深呼吸する、その場を少し離れる。この3つは、感情を消すためではなく、強い言葉に飲み込まれないための方法です。","「今の自分、少し強くなっているかも」と気づけたら、それだけで戻る入口に立てています。"],
+  security:["返信の速さや反応の数だけで、相手の気持ちを決めつけなくて大丈夫です。","不安になった時は、『事実』と『想像』を分けてみてください。見えていることと、心が作ったストーリーは違うことがあります。"],
+  communication:["分かってほしい時ほど、『察して』だけで終わらせず、短い言葉で伝える練習をしてみてください。","相手の話を最後まで聞くこと、待つことも、50：50の大切な力です。"],
+  respect:["冗談のつもりでも、相手の好きなもの・過去・弱さをいじると、関係が戻りにくくなることがあります。","その人の全部を決めつけず、相手の尊厳を残すこと。それがクラスの安心につながります。"],
+  control:["『分かってほしい』が強くなると、相手を動かそうとしてしまうことがあります。","相手にも予定・気分・自由があります。思い通りにするより、言葉で相談する方が50：50に近づきます。"],
+  responsibility:["自分の行動は、見えないところで誰かの負担になっていることがあります。","『これをしたら誰が困るかな』と一度考えられると、周りを見る力が育っていきます。"],
+  repair:["謝ること、許すことは、無かったことにすることではありません。","終わったことを、未来に攻撃する武器にしない。それが、戻れる関係を作る力です。"],
+  relation:["自分も相手も、まだ途中です。完璧ではないからこそ、戻る道を残すことが大切です。","誰かが戻ろうとしている時、もう一回入れる空気を作れるか。それも50：50です。"]
+};
+
+let current = 0;
+let answers = Array(questions.length).fill(null);
+let className = "";
+let studentNo = "";
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function startCheck(){
+  className = document.getElementById("className").value.trim();
+  studentNo = document.getElementById("studentNo").value.trim();
+  if(!className || !studentNo){
+    alert("クラスと番号を入力してください。");
+    return;
+  }
+  document.getElementById("smallId").textContent = className + " " + studentNo + "番";
+  current = 0;
+  renderQuestion();
+  show("questionScreen");
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  document.getElementById("progressLabel").textContent = `Q${current+1} / ${questions.length}`;
+  document.getElementById("progressBar").style.width = `${((current)/questions.length)*100}%`;
+  document.getElementById("qnum").textContent = `Q${current+1}`;
+  document.getElementById("qtext").textContent = q.t;
+  const rabbit = document.getElementById("qRabbit");
+  rabbit.src = rabbitImages[current % rabbitImages.length];
+  rabbit.style.display = "block";
+
+  const choices = document.getElementById("choices");
+  choices.innerHTML = "";
+  for(let i=0;i<=5;i++){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "choice" + (answers[current] === i ? " selected" : "");
+    b.innerHTML = `${i}<span>${i===0?"全然":i===5?"かなり":""}</span>`;
+    b.onclick = () => {
+      answers[current] = i;
+      renderQuestion();
+      setTimeout(()=>nextQuestion(true),120);
+    };
+    choices.appendChild(b);
+  }
+  document.getElementById("nextBtn").textContent = current === questions.length-1 ? "回答一覧へ" : "次へ";
+}
+
+function nextQuestion(auto=false){
+  if(answers[current] === null){
+    if(!auto) alert("0〜5のどれかを選んでください。");
+    return;
+  }
+  if(current < questions.length-1){
+    current++;
+    renderQuestion();
+  }else{
+    showSummary();
+  }
+}
+
+function prevQuestion(){
+  if(current > 0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function goQuestion(i){
+  current = i;
+  renderQuestion();
+  show("questionScreen");
+}
+
+function totalScore(){
+  return answers.reduce((a,b)=>a+(Number(b)||0),0);
+}
+
+function showSummary(){
+  const total = totalScore();
+  document.getElementById("summaryId").textContent = `${className} ${studentNo}番`;
+  document.getElementById("summaryTotal").textContent = `合計 ${total} / ${questions.length*5}`;
+  const list = document.getElementById("answerList");
+  list.innerHTML = "";
+  questions.forEach((q,i)=>{
+    const div = document.createElement("div");
+    div.className = "ansItem";
+    div.innerHTML = `<div class="ansNo">Q${i+1}</div><div class="ansQ">${q.t}</div><div class="ansVal">${answers[i]}</div>`;
+    list.appendChild(div);
+  });
+  show("summaryScreen");
+}
+
+function showResult(){
+  const total = totalScore();
+  const max = questions.length*5;
+  const percent = Math.round(total/max*100);
+
+  document.getElementById("resultId").textContent = `${className} ${studentNo}番`;
+  document.getElementById("resultTotal").textContent = `合計 ${total} / ${max}`;
+  document.getElementById("scoreNum").textContent = total;
+  document.getElementById("scoreMax").textContent = `/ ${max}`;
+  document.getElementById("scoreCircle").style.setProperty("--deg", `${Math.round(percent*3.6)}deg`);
+
+  let title = "";
+  let message = "";
+  if(total >= 120){
+    title = "50：50をかなり意識できています";
+    message = "今の時点で、相手も自分も大切にする感覚がかなり育っています。ただし、いつでも完璧でいる必要はありません。崩れた時に戻れる方法を持っておくことが大切です。";
+  }else if(total >= 100){
+    title = "50：50を意識できている途中です";
+    message = "できている部分がたくさんあります。難しい場面では、6秒待つ・一回離れる・言葉を選び直すなど、戻るための処方箋を使ってみてください。";
+  }else if(total >= 80){
+    title = "50：50の難しさが見えてきています";
+    message = "人間関係は、思っているより難しいものです。ここで気づけたことに意味があります。まずは、自分が崩れやすい場面を一つ見つけるところから始めてみてください。";
+  }else if(total >= 50){
+    title = "少し感情や不安に引っ張られやすい時期かもしれません";
+    message = "これは悪い結果ではありません。人は誰でも、自分の苦しさが強くなると、相手を動かそうとしたり、強い言葉を使ったりすることがあります。気づけたところから、少しずつ戻れば大丈夫です。";
+  }else{
+    title = "今は、一人で抱えすぎないことも大切です";
+    message = "感情に持っていかれやすかったり、人との関係でしんどさを感じやすかったりする時期かもしれません。大切なのは、崩れないことではなく、戻ろうとできることです。先生や信頼できる人に話すことも、戻る方法の一つです。";
+  }
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultMessage").textContent = message;
+
+  const cats = {};
+  const counts = {};
+  questions.forEach((q,i)=>{
+    q.c.forEach(c=>{
+      cats[c] = (cats[c] || 0) + Number(answers[i]);
+      counts[c] = (counts[c] || 0) + 1;
+    });
+  });
+  const rates = Object.keys(cats).map(c=>({c, rate: cats[c]/(counts[c]*5)})).sort((a,b)=>a.rate-b.rate);
+  const selected = rates.slice(0,2);
+
+  const adviceArea = document.getElementById("adviceArea");
+  adviceArea.innerHTML = "";
+  selected.forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "advice";
+    div.innerHTML = `<h3>今、補強するとよさそうな部分：<br>${categoryNames[item.c]}</h3>
+      <ul>${adviceTexts[item.c].map(t=>`<li>${t}</li>`).join("")}</ul>`;
+    adviceArea.appendChild(div);
+  });
+
+  show("resultScreen");
+}
+
+function restart(){
+  if(confirm("最初からやり直しますか？")){
+    answers = Array(questions.length).fill(null);
+    current = 0;
+    show("startScreen");
+  }
+}
+</script>
+</body>
+</html>
